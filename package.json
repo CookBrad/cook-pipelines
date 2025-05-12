@@ -11,5 +11,8 @@
     "url": "https://github.com/CookBrad/cook-pipelines"
   },
   "author": "Brad Cook",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "aws-cdk-lib": "^2.195.0"
+  }
 }
