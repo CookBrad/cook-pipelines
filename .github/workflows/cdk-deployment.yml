@@ -7,17 +7,20 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 
         with:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci 
 
       - name: Build the CDK app
         run: npm run build
@@ -27,4 +30,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+          AWS_DEFAULT_REGION: us-east-2 # Use AWS_DEFAULT_REGION for CDK compatibility
