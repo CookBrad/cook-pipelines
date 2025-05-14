@@ -4,11 +4,11 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 const app = new cdk.App();
 
-export class MyPipelineStack extends cdk.Stack {
+export class PipelineStack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const pipeline = new pipelines.CodePipeline(this, 'MyPipeline', {
+        const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculator', {
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
                     connectionArn: `arn:aws:codestar-connections:us-east-2:850502434229:connection/${ssm.StringParameter.valueForStringParameter(this, '/connectionArn')}`,
@@ -19,6 +19,6 @@ export class MyPipelineStack extends cdk.Stack {
     }
 }
 
-new MyPipelineStack(app, 'MyPipelineStack');
+new PipelineStack(app, 'PipelineStack');
 
 app.synth();
