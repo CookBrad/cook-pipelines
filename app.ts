@@ -16,8 +16,7 @@ export class PipelineStack extends cdk.Stack {
                         this,
                         'connectionArn',
                         '/connectionArn'
-                    ).stringValue}
-                    `,
+                    ).stringValue}`,
                 }),
                 commands: ['npm ci', 'npm run build', 'npx cdk synth'],
             }),
