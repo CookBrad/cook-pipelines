@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as pipelines from 'aws-cdk-lib/pipelines';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 const app = new cdk.App();
 
@@ -14,7 +15,34 @@ export class PipelineStack extends cdk.Stack {
             },
         });
 
+        // Create an IAM role for the pipeline
+        const pipelineRole = new iam.Role(this, 'PipelineRole', {
+            assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
+        });
+
+        // Add CodeStar Connections permission to the role
+        pipelineRole.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: ['codestar-connections:UseConnection'],
+            resources: ['arn:aws:codestar-connections:us-east-2:850502434229:connection/*'],
+        }));
+
+        // Add other necessary permissions for CodePipeline (e.g., S3, CodeBuild)
+        pipelineRole.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: [
+                's3:GetObject',
+                's3:PutObject',
+                's3:ListBucket',
+                'codebuild:StartBuild',
+                'codebuild:BatchGetBuilds',
+                'iam:PassRole',
+            ],
+            resources: ['*'], // Adjust to specific resources for better security
+        }));
+
         const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculator', {
+            role: pipelineRole, // Pass the role to the pipeline
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
                     triggerOnPush: true,
