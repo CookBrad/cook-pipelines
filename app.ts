@@ -20,11 +20,12 @@ export class PipelineStack extends cdk.Stack {
             assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
         });
 
+        const regeionAndAccount = `${process.env.AWS_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}`
         // Add CodeStar Connections permission to the role
         pipelineRole.addToPolicy(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             actions: ['codestar-connections:UseConnection'],
-            resources: ['arn:aws:codestar-connections:us-east-2:850502434229:connection/*'],
+            resources: [`arn:aws:codestar-connections:${regeionAndAccount}:connection/*`],
         }));
 
         // Add other necessary permissions for CodePipeline (e.g., S3, CodeBuild)
@@ -46,7 +47,7 @@ export class PipelineStack extends cdk.Stack {
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
                     triggerOnPush: true,
-                    connectionArn: `arn:aws:codeconnections:us-east-2:850502434229:connection/${ssm.StringParameter.valueFromLookup(this, '/connectionArn')}`,
+                    connectionArn: `arn:aws:codeconnections:${process.env.AWS_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}:connection/${ssm.StringParameter.valueFromLookup(this, '/connectionArn')}`,
                 }),
                 commands: ['npm ci', 'npm run build', 'npx cdk synth'],
             }),
