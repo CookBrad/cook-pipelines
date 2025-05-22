@@ -49,7 +49,7 @@ export class PipelineStack extends cdk.Stack {
         const connectionArn = `arn:aws:codeconnections:${process.env.AWS_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}:connection/${ssm.StringParameter.valueFromLookup(this, '/connectionArn')}`;
 
         // Define the pipeline
-        const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculator', {
+        const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculatorPipleine', {
             role: pipelineRole,
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
@@ -71,7 +71,7 @@ export class PipelineStack extends cdk.Stack {
                 ],
             },
         });
-        const pipelineStage = new CdkPipelinesStage(this, 'InvestmentCalculator', {
+        const pipelineStage = new CdkPipelinesStage(this, 'InvestmentCalculatorStage', {
             ...props,
             name: ``,
             env: {
