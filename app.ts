@@ -71,6 +71,9 @@ export class PipelineStack extends cdk.Stack {
 export class CdkPipelinesStage extends cdk.Stage {
     constructor(scope: any, id: string, props?: any) {
         super(scope, id, props);
+        new props.stack(this, `${props.name}DeploymentStack`, {
+            ...props || {},
+        });
     }
 }
 
