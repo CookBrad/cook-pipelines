@@ -19,13 +19,14 @@ export class PipelineStack extends cdk.Stack {
         const pipelineRole = new iam.Role(this, 'PipelineRole', {
             assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
         });
-
-        const regeionAndAccount = `${process.env.AWS_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}`
+        const account = process.env.CDK_DEFAULT_ACCOUNT;
+        const region = process.env.CDK_DEFAULT_REGION;
+        const regionAndAccount = `${region}:${account}`
         // Add CodeStar Connections permission to the role
         pipelineRole.addToPolicy(new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
             actions: ['codestar-connections:UseConnection'],
-            resources: [`arn:aws:codestar-connections:${regeionAndAccount}:connection/*`],
+            resources: [`arn:aws:codestar-connections:${regionAndAccount}:connection/*`],
         }));
 
         // Add other necessary permissions for CodePipeline (e.g., S3, CodeBuild)
@@ -41,8 +42,8 @@ export class PipelineStack extends cdk.Stack {
             ],
             resources: ['*'], // Adjust to specific resources for better security
         }));
-
-        const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculator', {
+        const repositoryName = 'InvestmentCalculator';
+        const pipeline = new pipelines.CodePipeline(this, 'repositoryName', {
             role: pipelineRole, // Pass the role to the pipeline
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
@@ -52,6 +53,24 @@ export class PipelineStack extends cdk.Stack {
                 commands: ['npm ci', 'npm run build', 'npx cdk synth'],
             }),
         });
+        const pipelineStage = new CdkPipelinesStage(this, repositoryName, {
+            ...props,
+            name: ``,
+            env: {
+                account,
+                region: region
+            }
+        });
+
+        // Deploy Stage
+        const deploymentStage = pipeline.addStage(pipelineStage);
+
+    }
+}
+
+export class CdkPipelinesStage extends cdk.Stage {
+    constructor(scope: any, id: string, props?: any) {
+        super(scope, id, props);
     }
 }
 
