@@ -2,7 +2,9 @@ import * as cdk from 'aws-cdk-lib';
 import * as pipelines from 'aws-cdk-lib/pipelines';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { Stack } from 'aws-cdk-lib';
 
+const app = new cdk.App();
 export class PipelineStack extends cdk.Stack {
     constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
         super(scope, id, {
@@ -17,8 +19,9 @@ export class PipelineStack extends cdk.Stack {
         const pipelineRole = new iam.Role(this, 'PipelineRole', {
             assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
         });
-
-        const regionAndAccount = `${process.env.AWS_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}`;
+        const account = process.env.CDK_DEFAULT_ACCOUNT;
+        const region = process.env.CDK_DEFAULT_REGION;
+        const regionAndAccount = `${account}:${region}`;
 
         // Add CodeStar Connections permission to the role
         pipelineRole.addToPolicy(new iam.PolicyStatement({
@@ -68,5 +71,30 @@ export class PipelineStack extends cdk.Stack {
                 ],
             },
         });
+        const pipelineStage = new CdkPipelinesStage(this, 'InvestmentCalculator', {
+            ...props,
+            name: ``,
+            env: {
+                account,
+                region: region
+            }
+        });
+
+        // Deploy Stage
+        const deploymentStage = pipeline.addStage(pipelineStage);
+
     }
 }
+
+export class CdkPipelinesStage extends cdk.Stage {
+    constructor(scope: any, id: string, props?: any) {
+        super(scope, id, props);
+        new Stack(this, `${props.name}DeploymentStack`, {
+            ...props || {},
+        });
+    }
+}
+
+new PipelineStack(app, 'PipelineStack');
+
+app.synth();
