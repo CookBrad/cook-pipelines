@@ -1,4 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
+import { Stack } from 'aws-cdk-lib';
+
 import * as pipelines from 'aws-cdk-lib/pipelines';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -71,7 +73,7 @@ export class PipelineStack extends cdk.Stack {
 export class CdkPipelinesStage extends cdk.Stage {
     constructor(scope: any, id: string, props?: any) {
         super(scope, id, props);
-        new props.stack(this, `${props.name}DeploymentStack`, {
+        new Stack(this, `${props.name}DeploymentStack`, {
             ...props || {},
         });
     }
