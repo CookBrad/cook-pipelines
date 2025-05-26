@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as pipelines from 'aws-cdk-lib/pipelines';
+import { Pipeline, PipelineType } from 'aws-cdk-lib/aws-codepipeline';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
@@ -47,10 +48,16 @@ export class PipelineStack extends cdk.Stack {
 
         // Construct the CodeStar Connections ARN using SSM parameter
         const connectionArn = `arn:aws:codeconnections:${process.env.AWS_DEFAULT_REGION}:${process.env.CDK_DEFAULT_ACCOUNT}:connection/${ssm.StringParameter.valueFromLookup(this, '/connectionArn')}`;
+        const codepipelineProps = {
+            restartExecutionOnUpdate: true,
+            pipelineType: PipelineType.V2,
+        };
+        const codePipeline = new Pipeline(this, 'pipeline-base', codepipelineProps);
 
         // Define the pipeline
         const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculatorPipleine', {
             role: pipelineRole,
+            codePipeline,
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
                     triggerOnPush: true,
