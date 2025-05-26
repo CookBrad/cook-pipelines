@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as pipelines from 'aws-cdk-lib/pipelines';
-import { Pipeline, PipelineType } from 'aws-cdk-lib/aws-codepipeline';
+import { Pipeline, PipelineType, ExecutionMode } from 'aws-cdk-lib/aws-codepipeline';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
@@ -51,6 +51,7 @@ export class PipelineStack extends cdk.Stack {
         const codepipelineProps = {
             restartExecutionOnUpdate: true,
             pipelineType: PipelineType.V2,
+            executionMode: ExecutionMode.QUEUED,
             role: pipelineRole
         };
         const codePipeline = new Pipeline(this, 'pipeline-base', codepipelineProps);
