@@ -51,12 +51,13 @@ export class PipelineStack extends cdk.Stack {
         const codepipelineProps = {
             restartExecutionOnUpdate: true,
             pipelineType: PipelineType.V2,
+            role: pipelineRole
         };
         const codePipeline = new Pipeline(this, 'pipeline-base', codepipelineProps);
 
         // Define the pipeline
         const pipeline = new pipelines.CodePipeline(this, 'InvestmentCalculatorPipleine', {
-            role: pipelineRole,
+
             codePipeline,
             synth: new pipelines.ShellStep('Synth', {
                 input: pipelines.CodePipelineSource.connection('CookBrad/investment-calculator-ts', 'main', {
