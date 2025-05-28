@@ -90,7 +90,8 @@ export class PipelineStack extends cdk.Stack {
         });
 
         // Deploy Stage
-        const deploymentStage = pipeline.addStage(pipelineStage);
+        pipeline.addStage(pipelineStage);
+        pipeline.buildPipeline();
 
     }
 }
