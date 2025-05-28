@@ -105,6 +105,6 @@ export class CdkPipelinesStage extends cdk.Stage {
     }
 }
 
-new PipelineStack(app, 'PipelineStack');
+new PipelineStack(app, 'InvestmentCalculatorPipelineStack');
 
 app.synth();
